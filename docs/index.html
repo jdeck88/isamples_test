@@ -3,95 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iSamples.org - Advancing FAIR Material Samples</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-        header {
-            background: #003366;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        section {
-            padding: 20px;
-            max-width: 800px;
-            margin: auto;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .card {
-            background: #f4f4f4;
-            padding: 15px;
-            margin: 10px;
-            border-radius: 5px;
-            width: 100%;
-            text-align: center;
-        }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background: #003366;
-            color: white;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-        }
-    </style>
+    <title>iSamples</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
 </head>
 <body>
     <header>
-        <h1>Welcome to iSamples.org</h1>
-        <p>Advancing FAIR Material Samples through Innovative Infrastructure</p>
+        <h1>iSamples</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#data">Data</a></li>
+                <li><a href="#people">People</a></li>
+                <li><a href="#build">Build Your Dreams</a></li>
+            </ul>
+        </nav>
     </header>
     
-    <section>
-        <h2>About the iSamples Project</h2>
-        <p>iSamples is designed to create an infrastructure for registering and managing material samples with persistent identifiers (PIDs) and standard metadata, enabling better data reuse and scientific discoveries.</p>
+    <section id="hero">
+        <h2>Explore the World of Samples</h2>
+        <div id="map"></div>
     </section>
     
-    <section>
-        <h2>Project Deliverables</h2>
-        <div class="container">
-            <div class="card">
-                <h3>iSamples Central (iSC)</h3>
-                <p>Design and development of the iSamples Central architecture and API, supporting use cases, integrations, and a production deployment hosted by CyVerse.</p>
+    <section id="samples">
+        <h2>Sample Vignettes</h2>
+        <div class="grid">
+            <div class="sample">
+                <a href="https://www.eiscolabs.com/products/esng0041" target="_blank">
+                    <img src="https://tse1.mm.bing.net/th?id=OIP.2KUsHoi3zYXPMKm04-JMEgHaGt&pid=Api" alt="Basalt Rock Sample">
+                    <p>Basalt Rock Sample</p>
+                </a>
             </div>
-            <div class="card">
-                <h3>iSamples in a Box (iSB)</h3>
-                <p>Deployable system for local sample management, including API development, user interfaces, and support for standard identifiers like IGSN and ARKs.</p>
+            <div class="sample">
+                <a href="https://www.christies.com/lotfinder/Lot/a-greek-pottery-amphora-and-lid-geometric-5726657-details.aspx" target="_blank">
+                    <img src="https://tse1.mm.bing.net/th?id=OIP.QVPHC3kT7nRqIGo-_KSgCwHaLI&pid=Api" alt="Greek Pottery Amphora">
+                    <p>Greek Pottery Amphora</p>
+                </a>
             </div>
-            <div class="card">
-                <h3>Community & Standards Integration</h3>
-                <p>Mapping core metadata to MIxS, Darwin Core, IGSN, and DataCite standards to ensure broad interoperability.</p>
+            <div class="sample">
+                <a href="https://www.britannica.com/topic/pre-Columbian-civilizations/Andean-civilization" target="_blank">
+                    <img src="https://tse1.mm.bing.net/th?id=OIP.10fiycOCv7vi_3mDWe5L3QHaIh&pid=Api" alt="Andean Civilization">
+                    <p>Andean Civilization</p>
+                </a>
             </div>
-            <div class="card">
-                <h3>Use Case Testing</h3>
-                <p>Deployment and testing with key partners: Open Context, SESAR, GEOME, and Smithsonian Institution/EMU.</p>
-            </div>
-            <div class="card">
-                <h3>Community Engagement</h3>
-                <p>Hackathons, workshops, and outreach programs for developers and researchers, fostering international collaboration.</p>
+            <div class="sample">
+                <a href="https://commons.wikimedia.org/wiki/File%3AEtruscan_civilization_map.png" target="_blank">
+                    <img src="https://tse2.mm.bing.net/th?id=OIP.cY4ZNiml2dxAvJP2-1G3FgHaG1&pid=Api" alt="Etruscan Civilization Map">
+                    <p>Etruscan Civilization Map</p>
+                </a>
             </div>
         </div>
     </section>
     
-    <section>
-        <h2>Usage Metrics & Impact</h2>
-        <p>Tracking adoption and impact through sample registrations, system queries, metadata completeness improvements, and contributions to iSamples code.</p>
-        <p>Privacy protections ensure ethical and secure data collection in compliance with industry standards.</p>
+    <section id="about">
+        <h2>About iSamples</h2>
+        <p>Description of iSamples will go here...</p>
+    </section>
+    
+    <section id="data">
+        <h2>Data</h2>
+        <ul>
+            <li><a href="#download">Download Data</a></li>
+            <li><a href="#api">API</a></li>
+            <li><a href="#taxonomy">iSamples Taxonomy</a></li>
+        </ul>
+    </section>
+    
+    <section id="people">
+        <h2>People</h2>
+        <p>List of PI's and contributors...</p>
+    </section>
+    
+    <section id="build">
+        <h2>Build Your Dreams</h2>
+        <p>How to create your own map and get involved.</p>
     </section>
     
     <footer>
-        <p>&copy; 2025 iSamples.org | <a href="#">Contact Us</a></p>
+        <p>iSamples &copy; 2025</p>
     </footer>
 </body>
 </html>
-

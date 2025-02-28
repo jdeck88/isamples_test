@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Metadata Validator</title>
+    <script>
+        const REQUIRED_FIELDS = [
+            "materialSampleId",
+            "decimalLatitude",
+            "decimalLongitude",
+            "institutionCode",
+            "sampleEnteredBy",
+            "rights"
+        ];
+
+        async function handleRequest(event) {
+            event.respondWith(
+                new Promise(async (resolve) => {
+                    try {
+                        const request = event.request;
+
+                        // Ensure it's a POST request
+                        if (request.method !== "POST") {
+                            resolve(new Response(JSON.stringify({ status: "error", message: "Only POST allowed" }), {
+                                headers: { "Content-Type": "application/json" },
+                                status: 405
+                            }));
+                            return;
+                        }
+
+                        // Parse incoming JSON data
+                        const data = await request.json();
+                        let filledFields = REQUIRED_FIELDS.filter((field) => data[field]);
+
+                        let response;
+                        if (filledFields.length === 0) {
+                            response = { status: "invalid", message: "Invalid data, no required fields filled." };
+                        } else if (filledFields.length === REQUIRED_FIELDS.length) {
+                            response = { 
+                                status: "blue-ribbon", 
+                                message: "Congratulations! You have filled all required fields.",
+                                ribbon: "https://example.com/blue-ribbon.png"
+                            };
+                        } else if (filledFields.length >= 3) {
+                            response = { 
+                                status: "red-ribbon", 
+                                message: "You have filled at least three required fields.",
+                                ribbon: "https://example.com/red-ribbon.png"
+                            };
+                        } else {
+                            response = { status: "invalid", message: "Not enough fields filled." };
+                        }
+
+                        resolve(new Response(JSON.stringify(response), {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }));
+                    } catch (error) {
+                        resolve(new Response(JSON.stringify({ status: "error", message: "Invalid JSON" }), {
+                            headers: { "Content-Type": "application/json" },
+                            status: 400
+                        }));
+                    }
+                })
+            );
+        }
+
+        // Service Worker Registration
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js").then(() => {
+                console.log("Service Worker registered.");
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Sample Metadata Validator</h1>
+    <p>This page acts as a service that validates metadata submitted via a POST request.</p>
+</body>
+</html>
