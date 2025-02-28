@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to Parquet Map</title>
+
+    <!-- Leaflet.js for maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Apache Arrow for Parquet processing -->
+    <script type="module">
+        import * as arrow from "https://cdn.jsdelivr.net/npm/apache-arrow@latest/+esm";
+
+        // CSV File URL
+        const csvURL = "https://raw.githubusercontent.com/BNHM/berkeleymapper/refs/heads/master/examples/ucjeps.csv";
+
+        let map;
+
+        async function fetchCSV(url) {
+            const response = await fetch(url);
+            return await response.text();
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split("\n").map(line => line.split(","));
+            const headers = lines.shift();
+            
+            // Convert CSV into an object with column names
+            const data = headers.reduce((acc, header, i) => {
+                acc[header] = lines.map(row => row[i]?.trim() || "");
+                return acc;
+            }, {});
+            return data;
+        }
+
+        async function convertToParquet(csvData) {
+            // Ensure required columns exist
+            if (!csvData.decimalLatitude || !csvData.decimalLongitude) {
+                console.error("Missing latitude or longitude columns!");
+                return new Uint8Array(); // Return empty Parquet buffer
+            }
+
+            const numRows = csvData.decimalLatitude.length;
+            const validRows = [];
+
+            for (let i = 0; i < numRows; i++) {
+                const lat = parseFloat(csvData.decimalLatitude[i]);
+                const lng = parseFloat(csvData.decimalLongitude[i]);
+
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    validRows.push({
+                        decimalLatitude: lat,
+                        decimalLongitude: lng,
+                        metadata: JSON.stringify(
+                            Object.fromEntries(
+                                Object.keys(csvData).map(key => [key, csvData[key][i] || ""])
+                            )
+                        )
+                    });
+                }
+            }
+
+            if (validRows.length === 0) {
+                console.error("No valid rows to process.");
+                return new Uint8Array();
+            }
+
+            const schema = new arrow.Schema([
+                arrow.Field.new('decimalLatitude', new arrow.Float64()),
+                arrow.Field.new('decimalLongitude', new arrow.Float64()),
+                arrow.Field.new('metadata', new arrow.Utf8())
+            ]);
+
+            const table = arrow.Table.from(validRows, schema);
+
+            // Convert to Parquet buffer
+            const writer = arrow.RecordBatchFileWriter.writeAll(table);
+            return writer.finish().toUint8Array(); // Returns Parquet Uint8Array buffer
+        }
+
+        async function readParquet(parquetBuffer) {
+            if (parquetBuffer.length === 0) return [];
+
+            const table = await arrow.Table.from(parquetBuffer);
+            return table.toArray().map(row => ({
+                decimalLatitude: row.decimalLatitude.toString(),
+                decimalLongitude: row.decimalLongitude.toString(),
+                metadata: JSON.parse(row.metadata.toString())  // Parse metadata back to object
+            }));
+        }
+
+        function initializeMap() {
+            map = L.map("map").setView([0, 0], 2); // Default view
+
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        function addMarkersToMap(rows) {
+            let bounds = [];
+
+            rows.forEach(row => {
+                const lat = parseFloat(row.decimalLatitude);
+                const lng = parseFloat(row.decimalLongitude);
+                if (isNaN(lat) || isNaN(lng)) return;
+
+                const metadataHtml = Object.entries(row.metadata)
+                    .map(([key, value]) => `<b>${key}:</b> ${value}`)
+                    .join("<br>");
+
+                const marker = L.marker([lat, lng]).addTo(map);
+                marker.bindPopup(metadataHtml);
+                bounds.push([lat, lng]);
+            });
+
+            // Adjust map view to fit all points
+            if (bounds.length > 0) {
+                map.fitBounds(bounds);
+            }
+        }
+
+        async function loadData() {
+            try {
+                const csvText = await fetchCSV(csvURL);
+                const csvData = parseCSV(csvText);
+                const parquetBuffer = await convertToParquet(csvData);
+                const parquetData = await readParquet(parquetBuffer);
+                addMarkersToMap(parquetData);
+            } catch (error) {
+                console.error("Error processing data:", error);
+            }
+        }
+
+        // Initialize map and load data on page load
+        initializeMap();
+        loadData();
+    </script>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div> <!-- Fullscreen Map -->
+</body>
+</html>
